@@ -1,7 +1,5 @@
 package mysql
 
-import "fmt"
-
 // Del 删除数据
 //
 // table:删除数据的表
@@ -26,8 +24,15 @@ func (d *DB) Del(table string, req string) (err error) {
 // req:条件sql写法 where xxx
 func (d *DB) Count(table string, where string) int64 {
 	var re int64
-	fmt.Println(`SELECT COUNT(*) FROM ` + table + ` ` + where)
-	db := d.DB.Table(table).Count(&re)
+	db := d.DB.Table(table)
+	if db.Error != nil {
+		return 0
+	}
+	db = db.Where(where)
+	if db.Error != nil {
+		return 0
+	}
+	db = db.Count(&re)
 	if db.Error != nil {
 		return 0
 	}

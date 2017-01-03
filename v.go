@@ -69,9 +69,13 @@ func (v *V) MarshalJSON() ([]byte, error) {
 			return []byte("[]"), nil
 		}
 		datas := *v.IntArray
+		if len(datas) == 0 {
+			return []byte("[]"), nil
+		}
 		if len(datas) == 1 {
 			return []byte("[" + fmt.Sprint(datas[0]) + "]"), nil
 		}
+
 		strs := make([]string, len(datas))
 		n := len(datas) - 1
 		for k, v := range datas {
