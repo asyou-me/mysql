@@ -171,6 +171,12 @@ func (v V) Value() (driver.Value, error) {
 		bt, _ := json.Marshal(v.StringArray)
 		return string(bt), nil
 	}
+	if v.T == Bool {
+		if v.V == "true" {
+			return true, nil
+		}
+		return false, nil
+	}
 	return v.V, nil
 }
 

@@ -25,7 +25,7 @@ func (d *DB) Open(conf *pulic_type.MicroSerType) error {
 	d.DB, err = gorm.Open("mysql", conf.Id+":"+
 		conf.Secret+"@tcp("+conf.Addr+
 		")/"+conf.Attr["Database"].(string)+"?charset=utf8&parseTime=True&loc=Local")
-	d.DB.LogMode(true)
+	// d.DB.LogMode(true)
 	return err
 }
 
