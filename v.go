@@ -223,7 +223,10 @@ func (q *QueryBuilder) UpdateV(data map[string]*V) (string, error) {
 		index = index + 1
 	}
 	db := q.Engine.Exec(`UPDATE `+q.table+` SET `+sets+q.whereStr(), values...)
-	return "", db.Error
+	if db.Error != nil {
+		return "0", db.Error
+	}
+	return fmt.Sprint(db.RowsAffected), db.Error
 }
 
 // GetV 获取字段数据
@@ -241,7 +244,7 @@ func (q *QueryBuilder) GetV(data map[string]*V) (err error) {
 		values[index] = v
 		index = index + 1
 	}
-	query := `SELECT ` + gets + ` FROM ` + q.table + q.whereStr()
+	query := `SELECT ` + gets + ` FROM ` + q.table + q.whereStr() + q.OrderStr()
 	row := q.Engine.Raw(query).Row()
 	err = row.Scan(values...)
 	if err != nil {
@@ -266,8 +269,8 @@ func (q *QueryBuilder) ListV(files map[string]uint8, limit int, offset int) ([]*
 		index = index + 1
 	}
 	outs := make([]*map[string]*V, 0, limit)
-	query := `SELECT ` + gets + ` FROM ` + q.table + q.whereStr() + "" + ` LIMIT ` + fmt.Sprint(limit) + ` OFFSET ` + fmt.Sprint(offset)
-	db := q.Engine.Raw(query, q.args...)
+	query := `SELECT ` + gets + ` FROM ` + q.table + q.whereStr() + q.OrderStr() + ` LIMIT ` + fmt.Sprint(limit) + ` OFFSET ` + fmt.Sprint(offset)
+	db := q.Engine.Raw(query)
 	if db.Error != nil {
 		return nil, db.Error
 	}
