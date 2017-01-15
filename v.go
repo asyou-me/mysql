@@ -300,3 +300,51 @@ func (q *QueryBuilder) ListV(files map[string]uint8, limit int, offset int) ([]*
 	}
 	return outs, nil
 }
+
+// Search 获取字段数据
+func (q *QueryBuilder) Search(files map[string]uint8) ([]*map[string]*V, error) {
+	var gets string
+	var indexData = len(files) - 1
+	var index = 0
+	var fs = make([]string, len(files))
+	for k := range files {
+		if index == indexData {
+			gets = gets + "`" + k + "`"
+		} else {
+			gets = gets + "`" + k + "`,"
+		}
+		fs[index] = k
+		index = index + 1
+	}
+	outs := make([]*map[string]*V, 0, 10)
+	query := `SELECT ` + gets + ` FROM ` + q.table + q.whereStr() + q.OrderStr()
+	db := q.Engine.Raw(query)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	rows, err := db.Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := map[string]*V{}
+		values := make([]interface{}, len(files))
+		i := 0
+		for _, k := range fs {
+			v := &V{
+				T: files[k],
+			}
+			item[k] = v
+			values[i] = v
+			i = i + 1
+		}
+		err = rows.Scan(values...)
+		if err != nil {
+			continue
+		}
+		outs = append(outs, &item)
+	}
+	return outs, nil
+}
