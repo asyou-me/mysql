@@ -4,17 +4,11 @@ Package mysql 数据库处理对象
 package mysql
 
 import (
-	"database/sql"
-
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 
 	pulic_type "github.com/asyou-me/lib.v1/pulic_type"
 )
-
-func init() {
-	sql.Register("mysql_asyou", &mysql.MySQLDriver{})
-}
 
 // DB 数据库处理对象
 type DB struct {
@@ -28,7 +22,7 @@ func (d *DB) Open(conf *pulic_type.MicroSerType) error {
 	//初始化数据库
 	var err error
 
-	d.DB, err = gorm.Open("mysql_asyou", conf.Id+":"+
+	d.DB, err = gorm.Open("mysql", conf.Id+":"+
 		conf.Secret+"@tcp("+conf.Addr+
 		")/"+conf.Attr["Database"].(string)+"?charset=utf8&parseTime=True&loc=Local")
 	// d.DB.LogMode(true)
