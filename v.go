@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -63,7 +64,7 @@ func (v *V) MarshalJSON() ([]byte, error) {
 		}
 		return []byte("false"), nil
 	case String:
-		return []byte(`"` + v.V + `"`), nil
+		return []byte(strconv.Quote(v.V)), nil
 	case IntArray:
 		if v.IntArray == nil {
 			return []byte("[]"), nil
